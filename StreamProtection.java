@@ -2,11 +2,15 @@ package com.scottocus.accelerometer;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
-public class StreamProtection
+public class DataReaderTest
 {
 	public static void main(String[] args) throws IOException
 	{
@@ -16,59 +20,9 @@ public class StreamProtection
 		InputStream is = process.getInputStream();
 		InputStreamReader isr = new InputStreamReader(is);
 		BufferedReader br = new BufferedReader(isr);
-		String line, prevLine;
-		int ax1, ax2, timeFix, threshhold;
-		threshhold = 100;
-		
-		//Reads first line of data stream to initialize an updating comparison variable
-		prevLine = br.readLine();
-		//Initializes a variable which fixes later readings according to time change in output
-		if (prevLine.substring(2, 3).equals("."))
-		{
-			timeFix = 0;
-		}
-		else if (prevLine.substring(3, 4).equals("."))
-		{
-			timeFix = 1;
-		}
-		else if (prevLine.substring(4, 5).equals("."))
-		{
-			timeFix = 2;
-		}
-		else if (prevLine.substring(5, 6).equals("."))
-		{
-			timeFix = 3;
-		}
-		else if (prevLine.substring(6, 7).equals("."))
-		{
-			timeFix = 4;
-		}
-		else
-		{
-			timeFix = 5;
-		}
-		
-		//Converts string output of x-axis readings to integer based on length of digits in number
-		if (prevLine.substring(12 + timeFix, 13 + timeFix).equals(","))
-		{
-			ax1 = Integer.parseInt(prevLine.substring(11 + timeFix, 12 + timeFix));
-		}
-		else if (prevLine.substring(13 + timeFix, 14 + timeFix).equals(","))
-		{
-			ax1 = Integer.parseInt(prevLine.substring(11 + timeFix, 13 + timeFix));
-		}
-		else if (prevLine.substring(14 + timeFix, 15 + timeFix).equals(","))
-		{
-			ax1 = Integer.parseInt(prevLine.substring(11 + timeFix, 14 + timeFix));
-		}
-		else if (prevLine.substring(15 + timeFix, 16 + timeFix).equals(","))
-		{
-			ax1 = Integer.parseInt(prevLine.substring(11 + timeFix, 15 + timeFix));
-		}
-		else
-		{
-			ax1 = Integer.parseInt(prevLine.substring(11 + timeFix, 16 + timeFix));
-		}
+		SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+		String line;
+		int ax1 = 0, ay1 = 0, az1 = 0, timeFix, lineCount = 0;
 		
 		while ((line = br.readLine()) != null)
 		{
@@ -93,40 +47,102 @@ public class StreamProtection
 			{
 				timeFix = 4;
 			}
-			else
+			else if (line.substring(7, 8).equals("."))
 			{
 				timeFix = 5;
+			}
+			else if (line.substring(8, 9).equals("."))
+			{
+				timeFix = 6;
+			}
+			else if (line.substring(9, 10).equals("."))
+			{
+				timeFix = 7;
+			}
+			else
+			{
+				timeFix = 8;
 			}
 			
 			//Converts string data to integer data for different lengths of number
 			if (line.substring(12 + timeFix, 13 + timeFix).equals(","))
 			{
-				ax2 = Integer.parseInt(line.substring(11 + timeFix, 12 + timeFix));
+				ax1 += Integer.parseInt(line.substring(11 + timeFix, 12 + timeFix));
 			}
 			else if (line.substring(13 + timeFix, 14 + timeFix).equals(","))
 			{
-				ax2 = Integer.parseInt(line.substring(11 + timeFix, 13 + timeFix));
+				ax1 += Integer.parseInt(line.substring(11 + timeFix, 13 + timeFix));
 			}
 			else if (line.substring(14 + timeFix, 15 + timeFix).equals(","))
 			{
-				ax2 = Integer.parseInt(line.substring(11 + timeFix, 14 + timeFix));
+				ax1 += Integer.parseInt(line.substring(11 + timeFix, 14 + timeFix));
 			}
 			else if (line.substring(15 + timeFix, 16 + timeFix).equals(","))
 			{
-				ax2 = Integer.parseInt(line.substring(11 + timeFix, 15 + timeFix));
+				ax1 += Integer.parseInt(line.substring(11 + timeFix, 15 + timeFix));
 			}
 			else
 			{
-				ax2 = Integer.parseInt(line.substring(11 + timeFix, 16 + timeFix));
+				ax1 += Integer.parseInt(line.substring(11 + timeFix, 16 + timeFix));
 			}
 			
-			//Compares previous line x-axis data to current line, if difference is greater than 'threshhold' prints "ALERT!" to console
-		    if (Math.abs(ax1 - ax2) > threshhold)
+			if (line.substring(line.length() - 8, line.length() - 7).equals(",") && !(line.substring(line.length() - 6, line.length()).contains(",")))
+			{
+				az1 += Integer.parseInt(line.substring(line.length() - 6, line.length()));
+			}
+			else if (line.substring(line.length() - 7, line.length() - 6).equals(",") && !(line.substring(line.length() - 5, line.length()).contains(",")))
+			{
+				az1 += Integer.parseInt(line.substring(line.length() - 5, line.length()));
+			}
+			else if (line.substring(line.length() - 6, line.length() - 5).equals(",") && !(line.substring(line.length() - 4, line.length()).contains(",")))
+			{
+				az1 += Integer.parseInt(line.substring(line.length() - 4, line.length()));
+			}
+			else if (line.substring(line.length() - 5, line.length() - 4).equals(",") && !(line.substring(line.length() - 3, line.length()).contains(",")))
+			{
+				az1 += Integer.parseInt(line.substring(line.length() - 3, line.length()));
+			}
+			else if (line.substring(line.length() - 4, line.length() - 3).equals(","))
+			{
+				az1 += Integer.parseInt(line.substring(line.length() - 2, line.length()));
+			}
+			else if (line.substring(line.length() - 3, line.length() - 2).equals(","))
+			{
+				az1 += Integer.parseInt(line.substring(line.length() - 1, line.length()));
+			}
+			else
+			{
+				az1 += Integer.parseInt(line.substring(line.length() - 7, line.length()));
+			}
+			
+		    /**if(lineCount == 500)
 		    {
-		    	System.out.println("ALERT!");
-		    	//runtime.exec(cmd.exe /c shutdown -s);
-		    }
-		    ax1 = ax2; //current line data into previous line data
+		    	if(Math.abs(ax1 - -500) < 220 || Math.abs(ax1 - -500) > 520)
+		    	{
+		        	java.awt.Toolkit.getDefaultToolkit().beep();
+			    	System.out.println("ALERT!");
+			    	Calendar cal = Calendar.getInstance();
+			        System.out.println(dateFormat.format(cal.getTime()));
+			        PrintWriter out = new PrintWriter(new FileWriter("log.txt", true), true);
+			        out.println("Disturbance at:");
+			        out.println(dateFormat.format(cal.getTime()));
+			        out.println();
+			        out.close();
+			    	//runtime.exec("cmd.exe /c shutdown -s");
+			    	ax1 = 0;
+			    	az1 = 0;
+		    	}
+		    }**/
+			
+			if(lineCount == 500)
+			{
+				System.out.println(Math.abs(ax1/** - -500**/));
+				System.out.println(Math.abs(az1/** - -1016000**/));		        
+				ax1 = 0;
+				az1 = 0;
+				lineCount = -1;
+			}
+			lineCount++;
 		}
 	}
 }
