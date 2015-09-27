@@ -117,7 +117,7 @@ public class DataReaderTest
 			
 		    /**if(lineCount == 500)
 		    {
-		    	if(Math.abs(ax1 - -500) < 220 || Math.abs(ax1 - -500) > 520)
+		    	if(Math.abs(ax1 - -500) < 200 || Math.abs(ax1 - -500) > 500)
 		    	{
 		        	java.awt.Toolkit.getDefaultToolkit().beep();
 			    	System.out.println("ALERT!");
