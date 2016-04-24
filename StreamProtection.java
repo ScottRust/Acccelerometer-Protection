@@ -22,7 +22,7 @@ public class DataReaderTest
 		BufferedReader br = new BufferedReader(isr);
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		String line;
-		int /** ax1 = 0, ay1 = 0, az1 = 0,**/ timeFix, lineCount = 0, runs = 0;
+		int /** ax1 = 0, ay1 = 0, az1 = 0,**/ timeFix, lineCount = 0, runs = 0, consec = 0;
 		float ax1 = 0, ay1 = 0, az1 = 0, xBase = 0, yBase = 0, zBase = 0;
 		String ax, ay, az;
 		
@@ -303,19 +303,36 @@ public class DataReaderTest
 				System.out.println(Math.abs(ax1/250) - xBase);
 				System.out.println(Math.abs(ay1/250) - yBase);
 				System.out.println(Math.abs(az1/250) - zBase);
-				if(((Math.abs(Math.abs(ax1/250) - xBase)) > 1.2) || ((Math.abs(Math.abs(ay1/250) - yBase)) > 1.2) || (((Math.abs(Math.abs(az1/250))) - zBase) > 1.2))
+				if(((Math.abs(Math.abs(ax1/250) - xBase)) > 1.8) || ((Math.abs(Math.abs(ay1/250) - yBase)) > 1.8) || ((Math.abs(Math.abs(az1/250) - zBase)) > 1.8))
+				//1.2 - 1.8 depending on surface
 		    	{
-		        	java.awt.Toolkit.getDefaultToolkit().beep();
-			    	System.out.println("ALERT!");
+			    	System.out.println("WARNING!");
 			    	Calendar cal = Calendar.getInstance();
 			        System.out.println(dateFormat.format(cal.getTime()));
-			        PrintWriter out = new PrintWriter(new FileWriter("log.txt", true), true);
-			        out.println("Disturbance at:");
-			        out.println(dateFormat.format(cal.getTime()));
-			        out.println();
-			        out.close();
-			    	//runtime.exec("cmd.exe /c shutdown -s");
+			        PrintWriter warnOut = new PrintWriter(new FileWriter("warning log.txt", true), true);
+			        warnOut.println("Disturbance at:");
+			        warnOut.println(dateFormat.format(cal.getTime()));
+			        warnOut.println();
+			        warnOut.close();
+			        consec++;
+			        if(consec >= 3)
+			        {
+			        	System.out.println("ALERT!");
+				        java.awt.Toolkit.getDefaultToolkit().beep();
+				        System.out.println(dateFormat.format(cal.getTime()));
+				        PrintWriter alertOut = new PrintWriter(new FileWriter("alert log.txt", true), true);
+				        alertOut.println("Disturbance at:");
+				        alertOut.println(dateFormat.format(cal.getTime()));
+				        alertOut.println();
+				        alertOut.close();
+				    	//runtime.exec("cmd.exe /c shutdown -s");
+				        consec = 0;
+			        }
 		    	}
+				else
+				{
+					consec = 0;
+				}
 				ax1 = 0;
 				ay1 = 0;
 				az1 = 0;
